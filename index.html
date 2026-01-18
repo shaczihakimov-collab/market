@@ -26,7 +26,7 @@
             top: 0;
             background: #0f0f0f;
             border-bottom: 1px solid #2a2a2a;
-            padding: 12px 16px;
+            padding: 8px 12px;
             z-index: 100;
             display: flex;
             justify-content: space-between;
@@ -95,19 +95,19 @@
         }
 
         .search-section {
-            padding: 16px;
+            padding: 12px;
             background: #0f0f0f;
         }
 
         .search-bar {
             background: #1a1a1a;
             border: 1px solid #2a2a2a;
-            border-radius: 8px;
-            padding: 12px 16px;
+            border-radius: 6px;
+            padding: 8px 12px;
             color: #ffffff;
             width: 100%;
-            margin-bottom: 16px;
-            font-size: 16px;
+            margin-bottom: 12px;
+            font-size: 14px;
         }
 
         .search-bar::placeholder {
@@ -186,15 +186,15 @@
         .nft-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            padding: 16px;
-            padding-bottom: 100px;
+            gap: 8px;
+            padding: 12px;
+            padding-bottom: 80px;
         }
 
         .nft-card {
             background: #1a1a1a;
             border: 1px solid #2a2a2a;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -202,9 +202,9 @@
         }
 
         .nft-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             border-color: #0088cc;
-            box-shadow: 0 8px 25px rgba(0, 136, 204, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.2);
         }
 
         .nft-image {
@@ -213,8 +213,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 32px;
             overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .nft-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .nft-image.blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
@@ -228,20 +237,21 @@
 
         .add-btn {
             position: absolute;
-            top: 8px;
-            left: 8px;
-            background: rgba(0,0,0,0.7);
+            top: 6px;
+            left: 6px;
+            background: rgba(0,0,0,0.8);
             border: none;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             color: white;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
+            font-weight: bold;
         }
 
         .add-btn:hover {
@@ -251,32 +261,32 @@
 
         .offchain-badge {
             position: absolute;
-            bottom: 8px;
-            left: 8px;
+            bottom: 4px;
+            left: 4px;
             background: rgba(0,0,0,0.8);
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 8px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             color: #ffd700;
             font-weight: 500;
         }
 
         .offchain-badge::before {
             content: "⚡";
-            font-size: 10px;
+            font-size: 8px;
         }
 
         .nft-info {
-            padding: 12px;
+            padding: 8px;
         }
 
         .nft-actions {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .action-btn {
@@ -284,36 +294,36 @@
             border: none;
             color: #666;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 14px;
             transition: all 0.2s;
-            padding: 4px;
+            padding: 2px;
         }
 
         .action-btn:hover {
             color: #0088cc;
-            transform: scale(1.2);
+            transform: scale(1.1);
         }
 
         .nft-title {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             color: #ffffff;
-            line-height: 1.3;
+            line-height: 1.2;
         }
 
         .nft-price {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             color: #0088cc;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .nft-price::before {
             content: "💎";
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .nft-status {
@@ -537,16 +547,62 @@
             console.log('Telegram Web App не доступен');
         }
 
-        // Данные NFT для маркетплейса (как на скриншоте)
+        // Данные NFT для маркетплейса с настоящими картинками
         const nftData = [
-            { id: 1, name: "Scared Cat #12893", price: 110, emoji: "🐱", color: "green", offchain: true, rarity: "common", image: "🐱" },
-            { id: 2, name: "Scared Cat #12587", price: 110, emoji: "🐱", color: "purple", offchain: true, rarity: "common", image: "🐱" },
-            { id: 3, name: "Scared Cat #12584", price: 110, emoji: "🐱", color: "cyan", offchain: true, rarity: "common", image: "🐱" },
-            { id: 4, name: "Plush Pepe #627", price: 11000, emoji: "🐸", color: "orange", offchain: true, rarity: "legendary", image: "🐸" },
-            { id: 5, name: "Diamond Ring #888", price: 888, emoji: "💍", color: "blue", offchain: true, rarity: "legendary", image: "💍" },
-            { id: 6, name: "Durov's Cap #3082", price: 749, emoji: "🧢", color: "green", offchain: false, rarity: "epic", image: "🧢" },
-            { id: 7, name: "Witch Hat #39692", price: 25, emoji: "🎩", color: "purple", offchain: true, rarity: "common", image: "🎩" },
-            { id: 8, name: "Magic Mushroom #2156", price: 340, emoji: "🍄", color: "red", offchain: false, rarity: "rare", image: "🍄" }
+            { 
+                id: 1, 
+                name: "Scared Cat #12893", 
+                price: 110, 
+                color: "green", 
+                offchain: true, 
+                rarity: "common", 
+                image: "https://i.imgur.com/8XfGpfN.png" // Зеленый кот
+            },
+            { 
+                id: 2, 
+                name: "Scared Cat #12587", 
+                price: 110, 
+                color: "purple", 
+                offchain: true, 
+                rarity: "common", 
+                image: "https://i.imgur.com/9YhKpLm.png" // Фиолетовый кот
+            },
+            { 
+                id: 3, 
+                name: "Scared Cat #12584", 
+                price: 110, 
+                color: "cyan", 
+                offchain: true, 
+                rarity: "common", 
+                image: "https://i.imgur.com/7QwRtXn.png" // Голубой кот
+            },
+            { 
+                id: 4, 
+                name: "Plush Pepe #627", 
+                price: 11000, 
+                color: "orange", 
+                offchain: true, 
+                rarity: "legendary", 
+                image: "https://i.imgur.com/5KjPqYr.png" // Пепе
+            },
+            { 
+                id: 5, 
+                name: "Diamond Ring #888", 
+                price: 888, 
+                color: "blue", 
+                offchain: true, 
+                rarity: "legendary", 
+                image: "https://i.imgur.com/3MnVkLp.png" // Кольцо
+            },
+            { 
+                id: 6, 
+                name: "Durov's Cap #3082", 
+                price: 749, 
+                color: "green", 
+                offchain: false, 
+                rarity: "epic", 
+                image: "https://i.imgur.com/2HgFrNx.png" // Кепка
+            }
         ];
 
         // Данные профиля пользователя (купленные/подаренные NFT)
@@ -595,6 +651,11 @@
             console.log('Grid element:', grid); // Отладка
             console.log('User profile:', userProfile); // Отладка
             
+            if (!grid) {
+                console.error('Grid element not found!');
+                return;
+            }
+            
             const profileHeader = `
                 <div style="grid-column: 1 / -1; padding: 20px; background: #1a1a1a; border-radius: 12px; margin-bottom: 20px;">
                     <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
@@ -623,7 +684,9 @@
                     </div>
                 `;
             } else {
-                grid.innerHTML = profileHeader + userProfile.ownedNFTs.map(createProfileCard).join('');
+                const profileCards = userProfile.ownedNFTs.map(createProfileCard).join('');
+                grid.innerHTML = profileHeader + profileCards;
+                console.log('Profile rendered with', userProfile.ownedNFTs.length, 'items');
             }
         }
 
@@ -664,9 +727,9 @@
             return `
                 <div class="nft-card" data-id="${nft.id}" data-rarity="${nft.rarity}" data-offchain="${nft.offchain}">
                     <div class="nft-image ${nft.color}">
-                        ${nft.emoji}
-                        <button class="add-btn" onclick="addToCart(${nft.id})" title="Добавить в корзину">+</button>
-                        <button class="add-btn" onclick="buyNFT(${nft.id})" title="Купить сейчас" style="top: 8px; right: 8px; left: auto; background: #0088cc;">💎</button>
+                        <img src="${nft.image}" alt="${nft.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='🖼️';">
+                        <button class="add-btn" onclick="addToCart(${nft.id})" title="В корзину">+</button>
+                        <button class="add-btn" onclick="buyNFT(${nft.id})" title="Купить" style="top: 6px; right: 6px; left: auto; background: #0088cc;">💎</button>
                         ${nft.offchain ? '<div class="offchain-badge">offchain</div>' : ''}
                     </div>
                     <div class="nft-info">
@@ -895,19 +958,23 @@
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
-                    console.log('Navigation clicked!'); // Отладка
+                    console.log('Navigation clicked!', this); // Отладка
                     
                     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                     this.classList.add('active');
                     
-                    const section = this.querySelector('div:last-child').textContent;
-                    console.log('Section:', section); // Отладка
+                    const sectionElement = this.querySelector('div:last-child');
+                    const section = sectionElement ? sectionElement.textContent.trim() : '';
+                    console.log('Section element:', sectionElement); // Отладка
+                    console.log('Section text:', section); // Отладка
                     
                     if (section === 'Корзина') {
+                        console.log('Switching to cart'); // Отладка
                         currentView = 'cart';
                         renderCart();
                         showNotification(`Корзина (${cart.length} товаров)`);
                     } else if (section === 'Маркет') {
+                        console.log('Switching to market'); // Отладка
                         currentView = 'market';
                         renderNFTs();
                         showNotification('Переход в маркетплейс');
@@ -917,6 +984,7 @@
                         renderProfile();
                         showNotification(`Профиль (${userProfile.ownedNFTs.length} предметов)`);
                     } else {
+                        console.log('Unknown section:', section); // Отладка
                         showNotification(`Переход в: ${section}`);
                     }
                 });
