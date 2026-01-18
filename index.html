@@ -316,6 +316,38 @@
             font-size: 14px;
         }
 
+        .nft-status {
+            color: #666;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .nft-category {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .profile-card .nft-image {
+            position: relative;
+        }
+
+        .verified-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #0088cc;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -505,20 +537,92 @@
             console.log('Telegram Web App не доступен');
         }
 
-        // Данные NFT (точно как на скриншоте)
+        // Данные NFT для маркетплейса (как на скриншоте)
         const nftData = [
-            { id: 1, name: "Diamond Ring #888", price: 888, emoji: "📱", color: "blue", offchain: true, rarity: "legendary" },
-            { id: 2, name: "Durov's Cap #3082", price: 749, emoji: "🧢", color: "green", offchain: false, rarity: "epic" },
-            { id: 3, name: "Witch Hat #39692", price: 25, emoji: "🎩", color: "purple", offchain: true, rarity: "common" },
-            { id: 4, name: "Clover Pin #100057", price: 777, emoji: "🍭", color: "pink", offchain: false, rarity: "legendary" },
-            { id: 5, name: "Scared Cat #17205", price: 120, emoji: "🐱", color: "orange", offchain: true, rarity: "rare" },
-            { id: 6, name: "Hex Pot #39470", price: 60, emoji: "🧪", color: "gray", offchain: true, rarity: "uncommon" },
-            { id: 7, name: "Magic Mushroom #2156", price: 340, emoji: "🍄", color: "red", offchain: false, rarity: "rare" },
-            { id: 8, name: "Pixel Monster #8901", price: 199, emoji: "👾", color: "cyan", offchain: false, rarity: "rare" }
+            { id: 1, name: "Scared Cat #12893", price: 110, emoji: "🐱", color: "green", offchain: true, rarity: "common", image: "🐱" },
+            { id: 2, name: "Scared Cat #12587", price: 110, emoji: "🐱", color: "purple", offchain: true, rarity: "common", image: "🐱" },
+            { id: 3, name: "Scared Cat #12584", price: 110, emoji: "🐱", color: "cyan", offchain: true, rarity: "common", image: "🐱" },
+            { id: 4, name: "Plush Pepe #627", price: 11000, emoji: "🐸", color: "orange", offchain: true, rarity: "legendary", image: "🐸" },
+            { id: 5, name: "Diamond Ring #888", price: 888, emoji: "💍", color: "blue", offchain: true, rarity: "legendary", image: "💍" },
+            { id: 6, name: "Durov's Cap #3082", price: 749, emoji: "🧢", color: "green", offchain: false, rarity: "epic", image: "🧢" },
+            { id: 7, name: "Witch Hat #39692", price: 25, emoji: "🎩", color: "purple", offchain: true, rarity: "common", image: "🎩" },
+            { id: 8, name: "Magic Mushroom #2156", price: 340, emoji: "🍄", color: "red", offchain: false, rarity: "rare", image: "🍄" }
         ];
+
+        // Данные профиля пользователя (купленные/подаренные NFT)
+        const userProfile = {
+            balance: "0,006 TON",
+            ownedNFTs: [
+                { id: 101, name: "@sedllo", type: "username", price: "Не продается", emoji: "📱", color: "blue", category: "Telegram Usernames", verified: true },
+                { id: 102, name: "@hypersold", type: "username", price: "Не продается", emoji: "📱", color: "green", category: "Telegram Usernames", verified: true },
+                { id: 103, name: "Premium Gift #1337", type: "gift", price: "Подарок", emoji: "🎁", color: "pink", category: "Telegram Gifts", verified: false },
+                { id: 104, name: "Star Badge #42", type: "badge", price: "Награда", emoji: "⭐", color: "orange", category: "Achievements", verified: false }
+            ]
+        };
 
         let cart = [];
         let favorites = [];
+        let currentView = 'market'; // Текущий раздел: market, cart, profile, etc.
+        // Функция создания карточки для профиля
+        function createProfileCard(nft) {
+            const priceDisplay = nft.type === 'username' ? 
+                `<div class="nft-status">${nft.price}</div>` : 
+                `<div class="nft-price">${nft.price}</div>`;
+            
+            return `
+                <div class="nft-card profile-card" data-id="${nft.id}" data-type="${nft.type}">
+                    <div class="nft-image ${nft.color}">
+                        ${nft.emoji}
+                        ${nft.verified ? '<div class="verified-badge">✓</div>' : ''}
+                    </div>
+                    <div class="nft-info">
+                        <div class="nft-actions">
+                            <button class="action-btn" onclick="toggleLike(this, ${nft.id})">♡</button>
+                            <button class="action-btn" onclick="showOptions(${nft.id})">⋯</button>
+                        </div>
+                        <div class="nft-title">${nft.name}</div>
+                        <div class="nft-category">${nft.category}</div>
+                        ${priceDisplay}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Функция отображения профиля
+        function renderProfile() {
+            const grid = document.getElementById('nftGrid');
+            
+            const profileHeader = `
+                <div style="grid-column: 1 / -1; padding: 20px; background: #1a1a1a; border-radius: 12px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #0088cc, #00f2fe); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                            👤
+                        </div>
+                        <div>
+                            <div style="font-size: 20px; font-weight: 600; margin-bottom: 4px;">Мой профиль</div>
+                            <div style="color: #0088cc; font-size: 16px; font-weight: 500;">💎 ${userProfile.balance}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 20px; font-size: 14px; color: #666;">
+                        <div><span style="color: #fff; font-weight: 600;">${userProfile.ownedNFTs.length}</span> предметов</div>
+                        <div><span style="color: #fff; font-weight: 600;">${userProfile.ownedNFTs.filter(n => n.type === 'username').length}</span> юзернеймов</div>
+                        <div><span style="color: #fff; font-weight: 600;">${userProfile.ownedNFTs.filter(n => n.type === 'gift').length}</span> подарков</div>
+                    </div>
+                </div>
+            `;
+            
+            if (userProfile.ownedNFTs.length === 0) {
+                grid.innerHTML = profileHeader + `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #666;">
+                        <div style="font-size: 64px; margin-bottom: 20px;">👤</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Коллекция пуста</div>
+                        <div style="font-size: 14px;">Купите NFT в маркетплейсе</div>
+                    </div>
+                `;
+            } else {
+                grid.innerHTML = profileHeader + userProfile.ownedNFTs.map(createProfileCard).join('');
+            }
+        }
 
         // Функция показа уведомлений
         function showNotification(message) {
@@ -531,13 +635,13 @@
             }, 3000);
         }
 
-        // Функция создания NFT карточки
-        function createNFTCard(nft) {
+        // Функция создания NFT карточки для корзины
+        function createCartCard(nft) {
             return `
                 <div class="nft-card" data-id="${nft.id}" data-rarity="${nft.rarity}" data-offchain="${nft.offchain}">
                     <div class="nft-image ${nft.color}">
                         ${nft.emoji}
-                        <button class="add-btn" onclick="addToCart(${nft.id})">+</button>
+                        <button class="add-btn" onclick="removeFromCart(${nft.id})" style="background: #ff4757;">−</button>
                         ${nft.offchain ? '<div class="offchain-badge">offchain</div>' : ''}
                     </div>
                     <div class="nft-info">
@@ -550,6 +654,59 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Функция создания NFT карточки
+        function createNFTCard(nft) {
+            return `
+                <div class="nft-card" data-id="${nft.id}" data-rarity="${nft.rarity}" data-offchain="${nft.offchain}">
+                    <div class="nft-image ${nft.color}">
+                        ${nft.emoji}
+                        <button class="add-btn" onclick="addToCart(${nft.id})" title="Добавить в корзину">+</button>
+                        <button class="add-btn" onclick="buyNFT(${nft.id})" title="Купить сейчас" style="top: 8px; right: 8px; left: auto; background: #0088cc;">💎</button>
+                        ${nft.offchain ? '<div class="offchain-badge">offchain</div>' : ''}
+                    </div>
+                    <div class="nft-info">
+                        <div class="nft-actions">
+                            <button class="action-btn" onclick="toggleLike(this, ${nft.id})">♡</button>
+                            <button class="action-btn" onclick="showOptions(${nft.id})">⋯</button>
+                        </div>
+                        <div class="nft-title">${nft.name}</div>
+                        <div class="nft-price">${nft.price}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Функция отображения корзины
+        function renderCart() {
+            const grid = document.getElementById('nftGrid');
+            
+            if (cart.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #666;">
+                        <div style="font-size: 64px; margin-bottom: 20px;">🛒</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Корзина пуста</div>
+                        <div style="font-size: 14px;">Добавьте NFT из маркетплейса</div>
+                    </div>
+                `;
+            } else {
+                const totalPrice = cart.reduce((sum, nft) => sum + nft.price, 0);
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; padding: 16px; background: #1a1a1a; border-radius: 12px; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 16px; font-weight: 600;">Товаров в корзине: ${cart.length}</div>
+                                <div style="font-size: 14px; color: #666;">Общая стоимость: ${totalPrice} 💎</div>
+                            </div>
+                            <button onclick="clearCart()" style="background: #ff4757; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+                                Очистить
+                            </button>
+                        </div>
+                    </div>
+                    ${cart.map(createCartCard).join('')}
+                `;
+            }
         }
 
         // Функция отображения NFT
@@ -571,8 +728,16 @@
         // Функция добавления в корзину
         function addToCart(nftId) {
             const nft = nftData.find(n => n.id === nftId);
+            
+            // Проверяем, нет ли уже этого NFT в корзине
+            if (cart.find(item => item.id === nftId)) {
+                showNotification(`${nft.name} уже в корзине!`);
+                return;
+            }
+            
             cart.push(nft);
             showNotification(`${nft.name} добавлен в корзину! (${cart.length})`);
+            updateCartButton();
             
             // Отправляем данные в Telegram
             if (tg && tg.sendData) {
@@ -582,6 +747,62 @@
                     cart_count: cart.length
                 }));
             }
+        }
+
+        // Функция удаления из корзины
+        function removeFromCart(nftId) {
+            const nft = nftData.find(n => n.id === nftId);
+            cart = cart.filter(item => item.id !== nftId);
+            showNotification(`${nft.name} удален из корзины`);
+            updateCartButton();
+            
+            // Обновляем отображение корзины
+            if (currentView === 'cart') {
+                renderCart();
+            }
+        }
+
+        // Функция "покупки" NFT (добавление в профиль)
+        function buyNFT(nftId) {
+            const nft = nftData.find(n => n.id === nftId);
+            
+            // Проверяем, нет ли уже этого NFT в профиле
+            if (userProfile.ownedNFTs.find(item => item.name === nft.name)) {
+                showNotification(`${nft.name} уже в вашей коллекции!`);
+                return;
+            }
+            
+            // Добавляем в профиль как купленный NFT
+            const purchasedNFT = {
+                id: 200 + nftId,
+                name: nft.name,
+                type: 'nft',
+                price: `Куплен за ${nft.price} 💎`,
+                emoji: nft.emoji,
+                color: nft.color,
+                category: 'Purchased NFTs',
+                verified: false
+            };
+            
+            userProfile.ownedNFTs.push(purchasedNFT);
+            showNotification(`🎉 ${nft.name} куплен и добавлен в профиль!`);
+            
+            // Отправляем данные в Telegram
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify({
+                    action: 'buy_nft',
+                    nft: nft,
+                    profile_count: userProfile.ownedNFTs.length
+                }));
+            }
+        }
+
+        // Функция очистки корзины
+        function clearCart() {
+            cart = [];
+            showNotification('Корзина очищена');
+            updateCartButton();
+            renderCart();
         }
 
         // Функция лайка
@@ -675,7 +896,22 @@
                     this.classList.add('active');
                     
                     const section = this.querySelector('div:last-child').textContent;
-                    showNotification(`Переход в: ${section}`);
+                    
+                    if (section === 'Корзина') {
+                        currentView = 'cart';
+                        renderCart();
+                        showNotification(`Корзина (${cart.length} товаров)`);
+                    } else if (section === 'Маркет') {
+                        currentView = 'market';
+                        renderNFTs();
+                        showNotification('Переход в маркетплейс');
+                    } else if (section === 'Профиль') {
+                        currentView = 'profile';
+                        renderProfile();
+                        showNotification(`Профиль (${userProfile.ownedNFTs.length} предметов)`);
+                    } else {
+                        showNotification(`Переход в: ${section}`);
+                    }
                 });
             });
         });
