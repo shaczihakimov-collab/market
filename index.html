@@ -590,7 +590,10 @@
 
         // Функция отображения профиля
         function renderProfile() {
+            console.log('renderProfile called!'); // Отладка
             const grid = document.getElementById('nftGrid');
+            console.log('Grid element:', grid); // Отладка
+            console.log('User profile:', userProfile); // Отладка
             
             const profileHeader = `
                 <div style="grid-column: 1 / -1; padding: 20px; background: #1a1a1a; border-radius: 12px; margin-bottom: 20px;">
@@ -892,10 +895,13 @@
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
+                    console.log('Navigation clicked!'); // Отладка
+                    
                     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                     this.classList.add('active');
                     
                     const section = this.querySelector('div:last-child').textContent;
+                    console.log('Section:', section); // Отладка
                     
                     if (section === 'Корзина') {
                         currentView = 'cart';
@@ -906,6 +912,7 @@
                         renderNFTs();
                         showNotification('Переход в маркетплейс');
                     } else if (section === 'Профиль') {
+                        console.log('Switching to profile...'); // Отладка
                         currentView = 'profile';
                         renderProfile();
                         showNotification(`Профиль (${userProfile.ownedNFTs.length} предметов)`);
