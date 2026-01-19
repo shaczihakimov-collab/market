@@ -547,7 +547,7 @@
             console.log('Telegram Web App не доступен');
         }
 
-        // Данные NFT для маркетплейса с настоящими картинками
+        // Данные NFT для маркетплейса с настоящими Telegram NFT
         const nftData = [
             { 
                 id: 1, 
@@ -556,7 +556,9 @@
                 color: "green", 
                 offchain: true, 
                 rarity: "common", 
-                image: "https://i.imgur.com/8XfGpfN.png" // Зеленый кот
+                image: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f431.png",
+                emoji: "🐱",
+                nftLink: "https://t.me/nft/ScaredCat-12893"
             },
             { 
                 id: 2, 
@@ -565,7 +567,9 @@
                 color: "purple", 
                 offchain: true, 
                 rarity: "common", 
-                image: "https://i.imgur.com/9YhKpLm.png" // Фиолетовый кот
+                image: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f408.png",
+                emoji: "🐈",
+                nftLink: "https://t.me/nft/Scared-Cat-12587"
             },
             { 
                 id: 3, 
@@ -574,7 +578,9 @@
                 color: "cyan", 
                 offchain: true, 
                 rarity: "common", 
-                image: "https://i.imgur.com/7QwRtXn.png" // Голубой кот
+                image: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f63f.png",
+                emoji: "😿",
+                nftLink: "https://t.me/nft/ScaredCat-12584"
             },
             { 
                 id: 4, 
@@ -583,7 +589,9 @@
                 color: "orange", 
                 offchain: true, 
                 rarity: "legendary", 
-                image: "https://i.imgur.com/5KjPqYr.png" // Пепе
+                image: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f438.png",
+                emoji: "🐸",
+                nftLink: "https://t.me/nft/PlushPepe-627"
             },
             { 
                 id: 5, 
@@ -592,7 +600,9 @@
                 color: "blue", 
                 offchain: true, 
                 rarity: "legendary", 
-                image: "https://i.imgur.com/3MnVkLp.png" // Кольцо
+                image: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f48e.png",
+                emoji: "💎",
+                nftLink: "https://t.me/nft/DiamondRing-888"
             },
             { 
                 id: 6, 
@@ -601,7 +611,9 @@
                 color: "green", 
                 offchain: false, 
                 rarity: "epic", 
-                image: "https://i.imgur.com/2HgFrNx.png" // Кепка
+                image: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f9e2.png",
+                emoji: "🧢",
+                nftLink: "https://t.me/nft/Durov'sCap-3082"
             }
         ];
 
@@ -706,7 +718,9 @@
             return `
                 <div class="nft-card" data-id="${nft.id}" data-rarity="${nft.rarity}" data-offchain="${nft.offchain}">
                     <div class="nft-image ${nft.color}">
-                        ${nft.emoji}
+                        <img src="${nft.image}" alt="${nft.name}" 
+                             style="width: 100%; height: 100%; object-fit: cover;"
+                             onerror="this.style.display='none'; this.parentNode.innerHTML += '<div style=\\'position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-size: 48px;\\'>${nft.emoji}</div>';">
                         <button class="add-btn" onclick="removeFromCart(${nft.id})" style="background: #ff4757;">−</button>
                         ${nft.offchain ? '<div class="offchain-badge">offchain</div>' : ''}
                     </div>
@@ -727,7 +741,9 @@
             return `
                 <div class="nft-card" data-id="${nft.id}" data-rarity="${nft.rarity}" data-offchain="${nft.offchain}">
                     <div class="nft-image ${nft.color}">
-                        <img src="${nft.image}" alt="${nft.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='🖼️';">
+                        <img src="${nft.image}" alt="${nft.name}" 
+                             style="width: 100%; height: 100%; object-fit: cover;"
+                             onerror="this.style.display='none'; this.parentNode.innerHTML += '<div style=\\'position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-size: 48px;\\'>${nft.emoji}</div>';">
                         <button class="add-btn" onclick="addToCart(${nft.id})" title="В корзину">+</button>
                         <button class="add-btn" onclick="buyNFT(${nft.id})" title="Купить" style="top: 6px; right: 6px; left: auto; background: #0088cc;">💎</button>
                         ${nft.offchain ? '<div class="offchain-badge">offchain</div>' : ''}
@@ -931,13 +947,20 @@
                     const nftId = parseInt(card.dataset.id);
                     const nft = nftData.find(n => n.id === nftId);
                     
-                    showNotification(`Просмотр ${nft.name} - ${nft.price} 💎`);
+                    // Открываем настоящий NFT в Telegram
+                    if (nft.nftLink) {
+                        window.open(nft.nftLink, '_blank');
+                        showNotification(`Открываю ${nft.name} в Telegram`);
+                    } else {
+                        showNotification(`Просмотр ${nft.name} - ${nft.price} 💎`);
+                    }
                     
                     // Отправляем данные в Telegram
                     if (tg && tg.sendData) {
                         tg.sendData(JSON.stringify({
                             action: 'view_nft',
-                            nft: nft
+                            nft: nft,
+                            nft_link: nft.nftLink
                         }));
                     }
                 }
