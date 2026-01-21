@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="ngrok-skip-browser-warning" content="true">
+    <title>Аренда NFT | NFT RENTS</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 100vw;
+            min-height: 100vh;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background: #2a2a2a;
+            padding: 12px 16px;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        .tabs-container {
+            padding: 16px;
+            background: #1a1a1a;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tab {
+            flex: 1;
+            background: #333;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 16px;
+            color: #888;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .tab.active {
+            background: #ffd700;
+            color: #000;
+        }
+
+        .filters {
+            padding: 0 16px 16px;
+            background: #1a1a1a;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-label {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .filter-select {
+            width: 100%;
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23888' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 8px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 32px;
+        }
+
+        .filter-select option {
+            background: #333;
+            color: #ffffff;
+        }
+
+        .sort-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #1a1a1a;
+        }
+
+        .sort-bar:hover {
+            background: #2a2a2a;
+        }
+
+        .sort-icon {
+            font-size: 16px;
+            color: #ffd700;
+        }
+
+        .sort-text {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 16px;
+            padding-bottom: 100px;
+        }
+
+        .nft-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .nft-card {
+            background: #2a2a2a;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nft-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+        }
+
+        .nft-image {
+            position: relative;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .nft-image.orange { 
+            background: linear-gradient(135deg, #ff9a56, #ff6b35);
+        }
+        .nft-image.purple { 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .nft-image.pink { 
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .nft-number {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.8);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .nft-character {
+            font-size: 80px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .rent-period {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.8);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .nft-info {
+            padding: 16px;
+        }
+
+        .nft-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .price-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ton-icon {
+            width: 20px;
+            height: 20px;
+            background: #0088cc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .price-amount {
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .price-rub {
+            color: #666;
+            font-size: 12px;
+            margin-left: auto;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2a2a2a;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 12px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #666;
+            text-decoration: none;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 4px 8px;
+            border-radius: 8px;
+            min-width: 60px;
+        }
+
+        .nav-item.active {
+            color: #ffd700;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ffd700;
+            color: #1a1a1a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #888;
+        }
+
+        .empty-subtitle {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Анимации */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nft-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">Аренда NFT | NFT RENTS</div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="openMenu()">⋯</button>
+                <button class="header-btn" onclick="closeApp()">✕</button>
+            </div>
+        </div>
+
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('nft')">NFT</button>
+                <button class="tab" onclick="switchTab('username')">Username</button>
+                <button class="tab" onclick="switchTab('number')">Number</button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">Коллекции</label>
+                    <select class="filter-select" id="collectionFilter" onchange="applyFilters()">
+                        <option value="1">1 выбрана</option>
+                        <option value="plush-pepe">Plush Pepe</option>
+                        <option value="crypto-ducks">Crypto Ducks</option>
+                        <option value="pixel-art">Pixel Art</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Фон</label>
+                    <select class="filter-select" id="backgroundFilter" onchange="applyFilters()">
+                        <option value="all">Все</option>
+                        <option value="orange">Оранжевый</option>
+                        <option value="purple">Фиолетовый</option>
+                        <option value="pink">Розовый</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">Символ</label>
+                    <select class="filter-select" id="symbolFilter" onchange="applyFilters()">
+                        <option value="all">Все</option>
+                        <option value="pepe">Pepe</option>
+                        <option value="duck">Duck</option>
+                        <option value="cat">Cat</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="sort-bar" onclick="toggleSort()">
+            <span class="sort-icon">⚡</span>
+            <span class="sort-text">Сортировка</span>
+        </div>
+
+        <div class="content">
+            <div class="nft-grid" id="nftGrid">
+                <!-- NFT карточки будут добавлены через JavaScript -->
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchNav('home')">
+                <div class="nav-icon">🏠</div>
+                <div>Главная</div>
+            </div>
+            <div class="nav-item" onclick="switchNav('search')">
+                <div class="nav-icon">🔍</div>
+                <div>Поиск</div>
+            </div>
+            <div class="nav-item" onclick="switchNav('favorites')">
+                <div class="nav-icon">⭐</div>
+                <div>Избранное</div>
+            </div>
+            <div class="nav-item" onclick="switchNav('profile')">
+                <div class="nav-icon">👤</div>
+                <div>Профиль</div>
+            </div>
+        </div>
+
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <script>
+        // Обход предупреждения ngrok
+        if (window.location.href.includes('ngrok-free.dev') && !window.location.href.includes('ngrok-skip-browser-warning')) {
+            window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'ngrok-skip-browser-warning=true';
+        }
+        
+        // Инициализация Telegram Web App
+        let tg;
+        try {
+            tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            tg.setHeaderColor('#2a2a2a');
+            tg.setBackgroundColor('#1a1a1a');
+        } catch (e) {
+            console.log('Telegram Web App не доступен');
+        }
+
+        // Данные NFT для аренды
+        const nftData = [
+            { 
+                id: 460, 
+                name: "Plush Pepe", 
+                pricePerDay: 2.9, 
+                priceRub: 343.47, 
+                period: "1-34 дн.", 
+                color: "orange",
+                collection: "plush-pepe",
+                symbol: "pepe",
+                background: "orange",
+                character: "🐸"
+            },
+            { 
+                id: 2475, 
+                name: "Plush Pepe", 
+                pricePerDay: 3.16, 
+                priceRub: 381.04, 
+                period: "1-11 дн.", 
+                color: "purple",
+                collection: "plush-pepe",
+                symbol: "pepe",
+                background: "purple",
+                character: "🐸"
+            },
+            { 
+                id: 2450, 
+                name: "Plush Pepe", 
+                pricePerDay: 3.16, 
+                priceRub: 381.04, 
+                period: "1-11 дн.", 
+                color: "pink",
+                collection: "plush-pepe",
+                symbol: "pepe",
+                background: "pink",
+                character: "🐸"
+            },
+            { 
+                id: 1234, 
+                name: "Crypto Duck", 
+                pricePerDay: 4.5, 
+                priceRub: 542.25, 
+                period: "1-7 дн.", 
+                color: "orange",
+                collection: "crypto-ducks",
+                symbol: "duck",
+                background: "orange",
+                character: "🦆"
+            },
+            { 
+                id: 5678, 
+                name: "Pixel Cat", 
+                pricePerDay: 1.8, 
+                priceRub: 216.6, 
+                period: "1-30 дн.", 
+                color: "purple",
+                collection: "pixel-art",
+                symbol: "cat",
+                background: "purple",
+                character: "🐱"
+            },
+            { 
+                id: 9012, 
+                name: "Golden Pepe", 
+                pricePerDay: 5.2, 
+                priceRub: 626.4, 
+                period: "1-5 дн.", 
+                color: "pink",
+                collection: "plush-pepe",
+                symbol: "pepe",
+                background: "pink",
+                character: "🐸"
+            }
+        ];
+
+        // Состояние приложения
+        let currentTab = 'nft';
+        let sortOrder = 'asc';
+        let currentFilters = {
+            collection: '1',
+            background: 'all',
+            symbol: 'all'
+        };
+
+        // Функция показа уведомлений
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Функция создания NFT карточки
+        function createNFTCard(nft) {
+            return `
+                <div class="nft-card fade-in" onclick="rentNFT(${nft.id})">
+                    <div class="nft-image ${nft.color}">
+                        <div class="nft-number">#${nft.id}</div>
+                        <div class="nft-character">${nft.character}</div>
+                        <div class="rent-period">${nft.period}</div>
+                    </div>
+                    <div class="nft-info">
+                        <div class="nft-title">${nft.name}</div>
+                        <div class="price-card">
+                            <div class="ton-icon">T</div>
+                            <div class="price-amount">${nft.pricePerDay} /день</div>
+                            <div class="price-rub">~${nft.priceRub} руб.</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Функция отображения NFT
+        function renderNFTs() {
+            const grid = document.getElementById('nftGrid');
+            let filteredNFTs = [...nftData];
+
+            // Применяем фильтры
+            if (currentFilters.collection !== 'all' && currentFilters.collection !== '1') {
+                filteredNFTs = filteredNFTs.filter(nft => nft.collection === currentFilters.collection);
+            }
+            if (currentFilters.background !== 'all') {
+                filteredNFTs = filteredNFTs.filter(nft => nft.background === currentFilters.background);
+            }
+            if (currentFilters.symbol !== 'all') {
+                filteredNFTs = filteredNFTs.filter(nft => nft.symbol === currentFilters.symbol);
+            }
+
+            // Сортировка по цене
+            filteredNFTs.sort((a, b) => {
+                return sortOrder === 'asc' ? a.pricePerDay - b.pricePerDay : b.pricePerDay - a.pricePerDay;
+            });
+
+            if (filteredNFTs.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">Ничего не найдено</div>
+                        <div class="empty-subtitle">Попробуйте изменить фильтры</div>
+                    </div>
+                `;
+            } else {
+                grid.innerHTML = filteredNFTs.map(createNFTCard).join('');
+            }
+        }
+
+        // Функция аренды NFT
+        function rentNFT(nftId) {
+            const nft = nftData.find(n => n.id === nftId);
+            showNotification(`Аренда ${nft.name} #${nft.id} за ${nft.pricePerDay} TON/день`);
+            
+            // Отправляем данные в Telegram
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify({
+                    action: 'rent_nft',
+                    nft: nft,
+                    timestamp: Date.now()
+                }));
+            }
+        }
+
+        // Функция применения фильтров
+        function applyFilters() {
+            currentFilters.collection = document.getElementById('collectionFilter').value;
+            currentFilters.background = document.getElementById('backgroundFilter').value;
+            currentFilters.symbol = document.getElementById('symbolFilter').value;
+            
+            renderNFTs();
+        }
+
+        // Функция переключения сортировки
+        function toggleSort() {
+            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            const sortText = sortOrder === 'asc' ? 'по возрастанию цены' : 'по убыванию цены';
+            showNotification(`Сортировка ${sortText}`);
+            renderNFTs();
+        }
+
+        // Функция переключения табов
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Обновляем активный таб
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const tabNames = {
+                'nft': 'NFT',
+                'username': 'Username', 
+                'number': 'Number'
+            };
+            showNotification(`Переключено на: ${tabNames[tabName]}`);
+            
+            renderNFTs();
+        }
+
+        // Функция переключения навигации
+        function switchNav(section) {
+            // Обновляем активную навигацию
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+            
+            const sectionNames = {
+                'home': 'Главная',
+                'search': 'Поиск',
+                'favorites': 'Избранное',
+                'profile': 'Профиль'
+            };
+            showNotification(`Переход в: ${sectionNames[section]}`);
+        }
+
+        // Функция открытия меню
+        function openMenu() {
+            showNotification('Меню настроек');
+        }
+
+        // Функция закрытия приложения
+        function closeApp() {
+            if (tg && tg.close) {
+                tg.close();
+            } else {
+                showNotification('Закрытие приложения');
+            }
+        }
+
+        // Настройка главной кнопки Telegram
+        if (tg && tg.MainButton) {
+            tg.MainButton.text = "Арендовать NFT";
+            tg.MainButton.color = "#ffd700";
+            tg.MainButton.textColor = "#1a1a1a";
+            tg.MainButton.show();
+            
+            tg.MainButton.onClick(() => {
+                showNotification('Выберите NFT для аренды');
+            });
+        }
+
+        // Обработка закрытия приложения
+        if (tg && tg.onEvent) {
+            tg.onEvent('backButtonClicked', () => {
+                tg.close();
+            });
+        }
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNFTs();
+            showNotification('Добро пожаловать в аренду NFT!');
+        });
+    </script>
+</body>
+</html>
